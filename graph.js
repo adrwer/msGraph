@@ -16,3 +16,11 @@ async function getUser() {
         .get();
 }
 
+//Get user photo from Graph
+async function getUserPhoto() {
+    ensureScope('user.read');
+    return await graphClient
+        .api('/me/photo/$value')
+        .get();
+}
+
