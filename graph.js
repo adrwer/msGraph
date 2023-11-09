@@ -12,7 +12,7 @@ async function getUser() {
     ensureScope('user.read');
     return await graphClient
         .api('/me')
-        .select('id,displayName')
+        .select('id,displayName,mail')
         .get();
 }
 
@@ -22,5 +22,22 @@ async function getUserPhoto() {
     return await graphClient
         .api('/me/photo/$value')
         .get();
+}
+
+//Get user emails from Graph
+async function getUserEmails(nextLink) {
+    ensureScope('mail.read');
+    if(nextLink) {
+        return await graphClient
+        .api(nextLink)
+        .get()
+    } else {
+        return await graphClient
+        .api('/me/messages')
+        .select('subject,receivedDateTime')
+        .orderby('receivedDateTime desc')
+        .top(10)
+        .get();   
+    }
 }
 
