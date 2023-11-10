@@ -16,6 +16,9 @@ async function displayUI() {
 
     var showPhotoButton= document.getElementById('showProfilePhoto');
     showPhotoButton.style = "display: block";
+
+    var showEventsButton = document.getElementById('btnShowEvents');
+    showEventsButton.style = "display: block";
 }
 
 async function displayProfilePhoto() {
@@ -58,4 +61,24 @@ async function displayEmail() {
     if (nextLink) {
         document.getElementById('loadMoreContainer').style = 'display: block';
     }
+}
+
+async function displayEvents() {
+    const userEvents = await getUserCalendar();
+    if (!userEvents || userEvents.value.length < 1) {
+        var content = document.getElementById('content');
+        var noItemsMessage = document.createElement('p');
+        noItemsMessage.innerHTML = `No events for the coming week!`;
+        content.appendChild(noItemsMessage)
+    } else {
+        document.getElementById('eventWrapper').style = 'display: block';
+
+        var userEventsElement = document.getElementById('events');
+        userEvents.value.forEach(event => {
+            var eventLi = document.createElement('li');
+            eventLi.innerText = `${event.subject} - From  ${new Date(event.start.dateTime).toLocaleString()} to ${new Date(event.end.dateTime).toLocaleString()} `;
+            userEventsElement.appendChild(eventLi);
+        });
+    }
+    document.getElementById('btnShowEvents').style = 'display: none';
 }

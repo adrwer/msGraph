@@ -41,3 +41,17 @@ async function getUserEmails(nextLink) {
     }
 }
 
+//Get user's calendar events from Graph
+async function getUserCalendar() {
+    ensureScope('calendars.read');
+    const dateNow = new Date();
+    const dateNextWeek = new Date();
+    dateNextWeek.setDate(dateNextWeek.getDate() + 7);
+    return await graphClient
+        .api('/me/calendarview')
+        .query(`startDateTime=${dateNow.toISOString()}&endDateTime=${dateNextWeek.toISOString()}`)
+        .select('subject,start,end')
+        .orderby('Start/DateTime')
+        .get();
+}
+
