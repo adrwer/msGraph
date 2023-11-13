@@ -55,3 +55,35 @@ async function getUserCalendar() {
         .get();
 }
 
+//List user's files from Graph
+async function getUserFiles() {
+    ensureScope('files.read');
+    try {
+        const response = await graphClient
+            .api('/me/drive/root/children')
+            .select('id,name,folder,package')
+            .get();
+        return response.value;
+    } catch (error) {
+        console.error(error);
+    }
+
+}
+
+async function uploadFile(file) {
+    try {
+        ensureScope('files.readwrite');
+        let options = {
+            path: "/",
+            fileName: file.name,
+            rangeSize: 1024 * 1024 //must be a multiple of 320 KiB
+        };
+        const uploadTask = await MicrosoftGraph.OneDriveLargeFileUploadTask
+            .create(graphClient, file, options);
+        const response = await uploadTask.upload();
+        console.log(`File ${response.name} of ${response.size} bytes uploaded`);
+        return response;
+    } catch (error) {
+        console.error(error);
+    }
+}

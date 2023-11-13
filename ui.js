@@ -19,6 +19,8 @@ async function displayUI() {
 
     var showEventsButton = document.getElementById('btnShowEvents');
     showEventsButton.style = "display: block";
+
+    displayFiles();
 }
 
 async function displayProfilePhoto() {
@@ -81,4 +83,50 @@ async function displayEvents() {
         });
     }
     document.getElementById('btnShowEvents').style = 'display: none';
+}
+
+async function displayFiles() {
+    const userFiles = await getUserFiles();
+    const userFilesElement = document.getElementById('files');
+    while (userFilesElement.firstChild) {
+        userFilesElement.removeChild(userFilesElement.firstChild);
+    }
+    for (let file of userFiles) {
+        if (!file.folder && !file.package) {
+          let a = document.createElement('a');
+          a.href = '#';
+          a.onclick = () => { downloadFile(file); };
+          a.appendChild(document.createTextNode(file.name));
+          let fileLi = document.createElement('li');
+          fileLi.appendChild(a);
+          userFilesElement.appendChild(fileLi);
+        }
+      }
+}
+
+async function downloadFile(file) {
+    try {
+      const response = await graphClient
+          .api(`/me/drive/items/${file.id}`)
+          .select('@microsoft.graph.downloadUrl')
+          .get();
+      const downloadUrl = response["@microsoft.graph.downloadUrl"];
+      window.open(downloadUrl, "_self");
+    } catch (error) {
+      console.error(error);
+    }
+}
+
+function fileSelected(e) {
+    displayUploadMessage(`Uploading ${e.files[0].name} ...`);
+    uploadFile(e.files[0])
+        .then((response) => {
+            displayUploadMessage(`File ${response.name} of ${response.size} bytes uploaded`);
+            displayFiles();
+        });
+}
+
+function displayUploadMessage(message) {
+    const messageElement = document.getElementById('uploadMessage');
+    messageElement.innerText = message;
 }
