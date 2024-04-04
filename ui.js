@@ -62,6 +62,8 @@ async function displayEmail() {
 
     if (nextLink) {
         document.getElementById('loadMoreContainer').style = 'display: block';
+    } else {
+        document.getElementById('loadMoreContainer').style = 'display: none';
     }
 }
 
@@ -102,19 +104,6 @@ async function displayFiles() {
           userFilesElement.appendChild(fileLi);
         }
       }
-}
-
-async function downloadFile(file) {
-    try {
-      const response = await graphClient
-          .api(`/me/drive/items/${file.id}`)
-          .select('@microsoft.graph.downloadUrl')
-          .get();
-      const downloadUrl = response["@microsoft.graph.downloadUrl"];
-      window.open(downloadUrl, "_self");
-    } catch (error) {
-      console.error(error);
-    }
 }
 
 function fileSelected(e) {
